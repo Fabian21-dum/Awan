@@ -1,19 +1,17 @@
 <?php
 
-$host     = '127.0.0.1';
-$port     = 3306;
-$db_name  = 'inventaris_db';
-$username = 'user_inventaris';
-$password = 'Test123!';
+$dsn = sprintf(
+    "mysql:unix_socket=/cloudsql/%s;dbname=%s;charset=utf8mb4",
+    getenv('INSTANCE_CONNECTION_NAME'),
+    getenv('DB_NAME')
+);
 
-try {
-    $dsn = "mysql:host=$host;port=$port;dbname=$db_name;charset=utf8mb4";
-    $pdo = new PDO($dsn, $username, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
-    ]);
+$pdo = new PDO($dsn, getenv('DB_USER'), getenv('DB_PASS'), [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+]);
 
     // echo "Koneksi Berhasil!";
 } catch (PDOException $e) {
     die("Koneksi ke database gagal: " . $e->getMessage());
 }
+
