@@ -1,21 +1,23 @@
 FROM php:8.2-apache
 
-# PHP extensions
+# Install ekstensi PDO MySQL
 RUN docker-php-ext-install pdo pdo_mysql
 
 # Enable rewrite
 RUN a2enmod rewrite
 
-# Copy app & config
-COPY apache.conf /etc/apache2/sites-available/000-default.conf
+# Install envsubst
+RUN apt-get update && apt-get install -y gettext-base
+
+# Copy semua file
 COPY . /var/www/html/
 
-# Permissions
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Forward env PORT to apache.conf
-ENV PORT 8080
+# Expose port default (Cloud Run menggunakan $PORT)
 EXPOSE 8080
+ENV PORT 8080
 
-# Replace ${PORT} in apache.conf at runtime and start apache
-CMD envsubst '${PORT}' < /etc/apache2/sites-available/000-default.conf > /etc/apache2/sites-enabled/000-default.conf && apache2-foreground
+# Replace ${PORT} di apache.conf dan jalankan Apache foreground
+CMD envsubst '${PORT}' < /var/www/html/apache.conf > /etc/apache2/sites-enabled/000-default.conf && apache2-foreground
